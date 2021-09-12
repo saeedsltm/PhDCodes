@@ -38,11 +38,12 @@ for lat in lats:
         else:
             print("Required file '%s' not exists! Download it from: http://dwtkns.com/srtm30m/"%(f))
 
-for lat in lats:
-    grdFiles = sorted(glob("N%2dE*.grd"%(lat)))
-    if len(grdFiles):
-        reduce(mergeGrd, grdFiles)
-        os.rename(glob("*.GRD")[0], "%d.grd"%(lat))
+if len(lons) > 1:
+    for lat in lats:
+        grdFiles = sorted(glob("N%2dE*.grd"%(lat)))
+        if len(grdFiles):
+            reduce(mergeGrd, grdFiles)
+            os.rename(glob("*.GRD")[0], "%d.grd"%(lat))
 grdFiles = sorted(glob("*.grd"))
 reduce(mergeGrd, grdFiles)
 os.rename(glob("*.GRD")[0], "%d_%d-%d_%d.grd"%(LON_min, LON_max,
