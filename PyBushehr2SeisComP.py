@@ -25,7 +25,7 @@ for d in listDir:
         cmd = "seiscomp exec scart -I %s.mseed %s"%(d, sdsarchive)
         bad_files = 0
         for i,f in enumerate(files):
-            print(f, "%"+"%3.1f"%(100*i/len(files)))
+            print(f, "%3.1f"%(100*i/len(files))+"%")
             try:
                 st = read(f)
                 for tr in st:
