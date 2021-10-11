@@ -48,7 +48,7 @@ for j,stations in enumerate(staList):
         ylabel="Stations",
         xformatter="concise",
         xlim=(starttime.datetime, endtime.datetime))
-    for i,station in enumerate(stations):
+    for i,station in enumerate(list(filter(None, stations))):
         print(station)
         waveformPath = glob(os.path.join(station, "*Z.D"))[0]
         scanner = Scanner(format="MSEED")
