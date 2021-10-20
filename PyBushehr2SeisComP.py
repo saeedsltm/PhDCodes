@@ -15,7 +15,7 @@ Convert and move Parsian and Guralp waveform to SeisComP archive.
 
 """
 
-sdsarchive="/home/saeed/Programs/seiscomp/var/lib/archive"
+sdsarchive=os.path.join(os.environ["SEISCOMP_ROOT"], "var", "lib", "archive")
 listDir = filter(os.path.isdir, os.listdir(os.getcwd()))
 
 for d in listDir:

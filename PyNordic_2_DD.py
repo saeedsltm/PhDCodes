@@ -63,8 +63,16 @@ def get_ttim(ot, l, wet, log):
     sec = float(l[22:28])
     if sec>=60.00: sec=59.999
     l = l[:22]+'%006.3f'%(sec)+l[28:]
-    at = dt.strptime(l[18:28], "%H%M%S.%f")    
+    delayDay = False
+    try:
+        at = dt.strptime(l[18:28], "%H%M%S.%f")
+    except ValueError:
+        if float(l[18:20]) == 24:
+            l = l[:18]+"00"+l[20:]
+            at = dt.strptime(l[18:28], "%H%M%S.%f")
+            delayDay = True
     at = at.replace(year=tmp.year, month=tmp.month, day=tmp.day, hour=at.hour, minute=at.minute, second=at.second, microsecond=at.microsecond)
+    if delayDay: at = at.replace(day=at.day-1)
     if ot.hour == 23 and at.hour==0: at = at + td(days=1)
     ttim = at-ot
     ttim = ttim.total_seconds()
@@ -146,5 +154,8 @@ with open("STATION0.HYP") as f, open("station.dat", "w") as g:
             else: continue
             lat = ll.Latitude(degree=float(l[6:8]), minute=float(l[8:13])).decimal_degree
             lon = ll.Longitude(degree=float(l[15:17]), minute=float(l[17:21])).decimal_degree
-            elv = float(l[23:27])
+            try:
+                elv = float(l[23:27])
+            except ValueError:
+                elv = 0
             g.write("%4s %7.3f %7.3f %5d\n"%(sta, lat, lon, elv))

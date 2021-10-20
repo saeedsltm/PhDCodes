@@ -8,9 +8,8 @@ inpNordic = input("\n+++ Enter NORDIC file:\n")
 
 
 with open("report.inp", "w") as f:
-
     f.write("Date TimeE L E LatE LonE Dep E F Aga Nsta Rms Gap McA MlA MbA MsA MwA Fp Spec \n\
-            1    2         4    3    5                            6                         ")
+1    2         4    3    5                            6                         ")
 
 cmd = "report %s report.inp"
 os.system(cmd)

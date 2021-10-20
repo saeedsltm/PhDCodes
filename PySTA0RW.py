@@ -36,7 +36,10 @@ def Read_Nordic_Sta(inp='STATION0.HYP'):
                 sta_nam = l[:6].strip()
                 sta_lat = ll.Latitude(degree=float(l[6:8]),minute=float(l[8:13])).decimal_degree
                 sta_lon = ll.Longitude(degree=float(l[14:17]),minute=float(l[17:22])).decimal_degree
-                sta_elv = float(l[23:27])
+                try:
+                    sta_elv = float(l[23:27])
+                except ValueError:
+                    sta_elv = 0
                 pcr     = None
                 scr     = None
 
