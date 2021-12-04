@@ -4,7 +4,7 @@ from datetime import datetime as dt
 from datetime import timedelta as td
 from LatLon import lat_lon as ll
 import os, sys
-from re import sub
+from re import sub, match
 sys.path.append(os.environ["PYT_PRG"])
 from PySTA0RW import Read_Nordic_Sta
 
@@ -64,23 +64,50 @@ def get_ot(l):
     if flag_24h: ot = ot + td(seconds=3600)
     return ot
 
-# Get arrival time
-def get_ar(ot, l):
-    for i in [18,19,20,21,23,24,26,27]:
-        if not l[i].strip():
-            l = l[:i]+"0"+l[i+1:]
+def extract_ar(l, ot, nordicFormat1, nordicFormat2):
     flag_24h = False # if hour = 24, one day will be added to datetime
     if l[18:20] == "24": 
         flag_24h = True
         l = l[:18]+"23"+l[20:]
-    try:
-        ar = dt.strptime(l[18:28], "%H%M %S.%f")
-        if flag_24h: ar = ar + td(seconds=3600)
-    except ValueError:
-        ar = dt.strptime(l[18:23]+"00.00", "%H%M %S.%f")
-        ar = ar + td(seconds=60)
-    ar = ar.replace(year=ot.year, month=ot.month, day=ot.day)
+    if bool(nordicFormat1):
+        try:
+            ar = dt.strptime(l[18:28], "%H%M0%S.%f")
+            if flag_24h: ar = ar + td(seconds=3600)
+        except ValueError:
+            ar = dt.strptime(l[18:22]+"000.00", "%H%M0%S.%f")
+            ar = ar + td(seconds=60)
+        ar = ar.replace(year=ot.year, month=ot.month, day=ot.day)
+        return ar
+    elif bool(nordicFormat2):
+        try:
+            ar = dt.strptime(l[18:28], "%H%M%S.%f")
+            if flag_24h: ar = ar + td(seconds=3600)
+        except ValueError:
+            ar = dt.strptime(l[18:22]+"000.00", "%H%M%S.%f")
+            ar = ar + td(seconds=60)
+        ar = ar.replace(year=ot.year, month=ot.month, day=ot.day)
+        return ar
+
+# Get arrival time
+def get_ar(ot, l):
+    if l[25] == ".":
+        for i in [18,19,20,21,23,24,26,27]:
+            if not l[i].strip():
+                l = l[:i]+"0"+l[i+1:]
+    elif l[24] == ".":
+        for i in [18,19,20,21,22,23,26,27]:
+            if not l[i].strip():
+                l = l[:i]+"0"+l[i+1:]
+    elif l[22:28] == "      ":
+        for i in [18,19,20,21]:
+            if not l[i].strip():
+                l = l[:i]+"0"+l[i+1:]
+        l = l[:22]+"00.000"+l[28:]
+    nordicFormat1 = match("[0-9][0-9][0-9][0-9]0[0-9][0-9].[0-9][0-9]", l[18:28])
+    nordicFormat2 = match("[0-9][0-9][0-9][0-9][0-9][0-9].[0-9][0-9][0-9]", l[18:28])
+    ar = extract_ar(l, ot, nordicFormat1, nordicFormat2)
     return ar
+
 
 # Write new event-phase to hypoellipse format
 def write_to_hypoel(hypoel_file, event, nDevTT):
