@@ -68,11 +68,11 @@ def extract_ar(l, ot, nordicFormat1, nordicFormat2):
     flag_24h = False # if hour = 24, one day will be added to datetime
     if l[18:20] == "24": 
         flag_24h = True
-        l = l[:18]+"23"+l[20:]
+        l = l[:18]+"00"+l[20:]
     if bool(nordicFormat1):
         try:
             ar = dt.strptime(l[18:28], "%H%M0%S.%f")
-            if flag_24h: ar = ar + td(seconds=3600)
+            if flag_24h: ot = ot + td(days=1)
         except ValueError:
             ar = dt.strptime(l[18:22]+"000.00", "%H%M0%S.%f")
             ar = ar + td(seconds=60)
@@ -81,7 +81,7 @@ def extract_ar(l, ot, nordicFormat1, nordicFormat2):
     elif bool(nordicFormat2):
         try:
             ar = dt.strptime(l[18:28], "%H%M%S.%f")
-            if flag_24h: ar = ar + td(seconds=3600)
+            if flag_24h: ot = ot + td(days=1)
         except ValueError:
             ar = dt.strptime(l[18:22]+"000.00", "%H%M%S.%f")
             ar = ar + td(seconds=60)

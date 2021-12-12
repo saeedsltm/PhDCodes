@@ -52,7 +52,11 @@ def write_xyzm(hypo71_out):
                 if not ot[i].strip():
                     ot = ot[:i]+"0"+ot[i+1:]
             if float(l[12:17])>=60.0: ot = ot[:12]+"59.99"
-            ot = dt.strptime(ot, "%y%m%d %H%M %S.%f")
+            try:
+                ot = dt.strptime(ot, "%y%m%d %H%M %S.%f")
+            except ValueError:
+                print("Error while converting event in xyzm format >> ",l)
+                continue
             ort = ot.strftime('  %Y %m %d %H %M %S.%f')[:24]
 
             lat = ll.Latitude(degree=float(l[18:20]), minute=float(l[21:26])).decimal_degree

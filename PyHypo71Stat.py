@@ -47,8 +47,14 @@ class Hypo71():
         DsM = int(l[54:57])
         Gap = int(l[58:61])
         RMS = float(l[64:68])
-        ErH = float(l[68:73])
-        ErZ = float(l[73:78])
+        try:
+            ErH = float(l[68:73])
+        except ValueError:
+            ErH = 999.0
+        try:
+            ErZ = float(l[73:78])
+        except ValueError:
+            ErZ = 999.0
 
         return Lat, Lon, Dep, PhN, DsM, Gap, RMS, ErH, ErZ
 
@@ -62,14 +68,32 @@ class Hypo71():
         Ain = int(l[16:19])     # Incident Angle
         PPh = l[21]             # P-Phase Type
         Pol = l[22].strip()     # Polarity
-        Ptt = float(l[35:41])   # P-Phase Travel Time
-        Prs = float(l[53:59])   # P-Phase Timme Residual
-        Pwt = float(l[61:65])   # P-Phase Wieght
+        try:
+            Ptt = float(l[35:41])   # P-Phase Travel Time
+            Prs = float(l[53:59])   # P-Phase Timme Residual
+            try:
+               Pwt = float(l[61:65])   # P-Phase Wieght
+            except ValueError:
+                Pwt = 0.0
+        except:
+            PPh = None
+            Ptt = None
+            Prs = None
+            Pwt = None            
         if l[100].strip():
             SPh = l[100]            # S-Phase Type
-            Stt = float(l[109:115]) # S-Phase Travel Time
-            Srs = float(l[115:121]) # S-Phase Timme Residual
-            Swt = float(l[122:127]) # S-Phase Wieght
+            try:
+                Stt = float(l[109:115]) # S-Phase Travel Time
+                Srs = float(l[115:121]) # S-Phase Timme Residual
+                try:
+                   Swt = float(l[123:127]) # S-Phase Wieght
+                except ValueError:
+                    Swt = 0.0                
+            except ValueError:
+                SPh = None
+                Stt = None
+                Srs = None
+                Swt = None
         else:
             SPh = None
             Stt = None
@@ -85,9 +109,12 @@ class Hypo71():
 
             f.write(OriginTime.strftime("%s.%f"))
             f.write(" %6.3f %6.3f %5.2f %2d %3d %3d %4.2f %5.2f %5.2f "%EventInfo)
-            if PhaseInfo[8]:
+            if PhaseInfo[3] and PhaseInfo[8]:
                 f.write("%4s %5.1f %3d %1s %1s %4.1f %4.1f %1s %1s %4.1f %4.1f %1s\n"%PhaseInfo)
-            else:
+            # if not PhaseInfo[3] and PhaseInfo[8]:
+            #     print(PhaseInfo)
+            #     f.write("%4s %5.1f %3d %1s %1s %4.1f %4.1f %1s %1s %4.1f %4.1f %1s\n"%PhaseInfo)                
+            elif PhaseInfo[3]:
                 f.write("%4s %5.1f %3d %1s %1s %4.1f %4.1f %1s %1s %4s %4s %1s\n"%PhaseInfo)
 
 
@@ -105,12 +132,15 @@ class Hypo71():
 
                     l = next(f)
 
-                    OriginTime = self.DateTimeParser(l[:18])
-                    EventInfo = self.EventInfoParser(l)
-                    
+                    try:
+                        OriginTime = self.DateTimeParser(l[:18])
+                        EventInfo = self.EventInfoParser(l)
+                    except ValueError:
+                        continue
+
                 if pha_flag in line: pha_start = True
                 if pha_start and (line.startswith("1") or not line.strip()): pha_start = False
-                if pha_start and pha_flag not in line:
+                if pha_start and pha_flag not in line and line[1:5].strip():
                     PhaseInfo = self.PhaseInfoParser(line)
                     self.DBWriter(OriginTime, EventInfo, PhaseInfo)
 

@@ -164,9 +164,9 @@ def vpvs(d):
     plt.tight_layout()
     plt.savefig('Vp_Vs_%4.2f.png'%(slope),dpi=300)
     plt.close()
-    print '\n+++ Vp/Vs=%.2f\n'%(slope)
+    print('\n+++ Vp/Vs=%.2f\n'%(slope))
 
 
-inp = raw_input('\n\n+++ Enter NORDIC file name:\n\n')
-print ''
+inp = input('\n\n+++ Enter NORDIC file name:\n\n')
+print('')
 vpvs(Read_Nordic(inp))
