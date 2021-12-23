@@ -165,7 +165,8 @@ with open(inp_file) as f:
             depth  = float(l[38:43])
             nsta   = float(l[48:51])
             try:
-                mag    = float(l[56:59])
+                # mag = float(l[56:59])
+                mag = float(l[72:75])
             except ValueError: mag = 0.0 
 
             if second >= 60:

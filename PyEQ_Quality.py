@@ -20,6 +20,7 @@ random_mag = get_mag()
 
 def sum_reader(root, sum_type):
 
+
 ## Historical & Instrumental & Regional
     # ~ CA = {"MIN_OBS":0, "MAX_GAP":360, "MAX_RMS":9.9, "MAX_ERH":999, "MAX_ERZ":999}
     # ~ CB = {"MIN_OBS":0, "MAX_GAP":360, "MAX_RMS":9.9, "MAX_ERH":999, "MAX_ERZ":999}
@@ -27,16 +28,16 @@ def sum_reader(root, sum_type):
     # ~ OT = {"MIN_OBS":0, "MAX_GAP":360, "MAX_RMS":9.9, "MAX_ERH":999, "MAX_ERZ":999}
 
 # Hypoellipse & NLLOC
-#    CA = {"MIN_OBS":6, "MAX_GAP":180, "MAX_RMS":0.3, "MAX_ERH":3.0, "MAX_ERZ":5.0}
-#    CB = {"MIN_OBS":5, "MAX_GAP":200, "MAX_RMS":0.4, "MAX_ERH":7.0, "MAX_ERZ":10.}
-#    CC = {"MIN_OBS":5, "MAX_GAP":250, "MAX_RMS":0.5, "MAX_ERH":10., "MAX_ERZ":15.}
-#    OT = {"MIN_OBS":4, "MAX_GAP":250, "MAX_RMS":1.0, "MAX_ERH":99., "MAX_ERZ":99.}
+    CA = {"MIN_OBS":3, "MAX_GAP":360, "MAX_RMS":0.5, "MAX_ERH":5.0, "MAX_ERZ":5.0}
+    CB = {"MIN_OBS":3, "MAX_GAP":270, "MAX_RMS":0.5, "MAX_ERH":5.0, "MAX_ERZ":5.0}
+    CC = {"MIN_OBS":3, "MAX_GAP":270, "MAX_RMS":0.5, "MAX_ERH":3.0, "MAX_ERZ":3.0}
+    OT = {"MIN_OBS":4, "MAX_GAP":250, "MAX_RMS":1.0, "MAX_ERH":99., "MAX_ERZ":99.}
 
 # ~ # HypoDD
-    CA = {"MIN_OBS":1, "MAX_GAP":400, "MAX_RMS":0.1, "MAX_ERH":1.0, "MAX_ERZ":2.0}
-    CB = {"MIN_OBS":1, "MAX_GAP":400, "MAX_RMS":0.2, "MAX_ERH":2.0, "MAX_ERZ":4.0}
-    CC = {"MIN_OBS":1, "MAX_GAP":400, "MAX_RMS":0.3, "MAX_ERH":4.0, "MAX_ERZ":8.0}
-    OT = {"MIN_OBS":1, "MAX_GAP":400, "MAX_RMS":1.0, "MAX_ERH":99., "MAX_ERZ":99.}
+    # CA = {"MIN_OBS":1, "MAX_GAP":400, "MAX_RMS":0.1, "MAX_ERH":1.0, "MAX_ERZ":2.0}
+    # CB = {"MIN_OBS":1, "MAX_GAP":400, "MAX_RMS":0.2, "MAX_ERH":2.0, "MAX_ERZ":4.0}
+    # CC = {"MIN_OBS":1, "MAX_GAP":400, "MAX_RMS":0.3, "MAX_ERH":4.0, "MAX_ERZ":8.0}
+    # OT = {"MIN_OBS":1, "MAX_GAP":400, "MAX_RMS":1.0, "MAX_ERH":99., "MAX_ERZ":99.}
 
 
     out_A = os.path.join(root, "QA.dat")

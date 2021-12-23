@@ -26,7 +26,8 @@ ChangeLogs:
 25-Jul-2017 > Now, stations sorts by length, uppercase, alphabetically.
 02-Feb-2021 > Rewrite the code completely.
 16-Apr-2021 > Add function for detecting deviant travel times.
-18-Apr-2021 > Fixed issue when reading magnitude
+18-Apr-2021 > Fixed issue when reading magnitude.
+23-Dec-2021 > Fixed issue when there is only S phase without corresponding P phase.
 """
 
 #___________________SECTION I: Make "hypoel.pha" phase file
@@ -35,6 +36,16 @@ ChangeLogs:
 def upper(s):
     return s.upper()
 
+# Make a fake p phase if S reading exists but there is no corresponding P phase
+def makeFakePhase(phaseDict):
+    if phaseDict["S_ph"] and not phaseDict["P_ph"]:
+        phaseDict["P_onset"] = " "
+        phaseDict["P_ph"] = "P"
+        phaseDict["P_w"] = "4"
+        phaseDict["P_pol"] = " "
+        phaseDict["P_ar"] = phaseDict["S_ar"].replace(second=0, microsecond=0)
+    return phaseDict
+        
 # Calculate maximum P and S travel time and alert if deviant travel time detected
 def AlertDevTT(ot, ar, ph, nDevTT):
     pMaxTT = 200 # t=x/v; x=900km, v=6.0km/s; 166s ~ 200
@@ -202,6 +213,7 @@ def mk_phase_file(nordic_inp):
                                       "amp":amp,
                                       "per":per
                                       })
+                    event[ot][sta] = makeFakePhase(event[ot][sta])
                 l = next(f)
             else:
                 nDevTT=write_to_hypoel(hypoel_file, event, nDevTT)
