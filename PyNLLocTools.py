@@ -257,8 +257,8 @@ class main():
                         
                     arival_t = dt(int(line[6][0:4]),int(line[6][4:6]),int(line[6][6:8]),
                                   int(line[7][0:2]),int(line[7][2:4]),int(line[8].split('.')[0]),
-                                  int(line[8].split('.')[1])*100)
-                    line_4 = ' %-5s%1s%1s %1s%-4s%1d %1s %02d%02d %5.1f                                                   4\n'\
+                                  int(line[8].split('.')[1]))
+                    line_4 = ' %-5s%1s%1s %1s%-4s%1d %1s %02d%02d %5.2f                                                   4\n'\
                              %(sta_name,Instrument,comp,Quality_Indicator,Phase_ID,Weighting_Indicator,First_Motion,arival_t.hour,arival_t.minute,arival_t.second+arival_t.microsecond*1e-6)
                     hypo_file.write(line_4)
 
