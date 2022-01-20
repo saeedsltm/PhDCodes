@@ -309,7 +309,7 @@ for i in range(num_fig):
         c+=1
 
     plt.tight_layout()
-    plt.savefig(os.path.join('figs','foc_res%d.png'%(i+1)),dpi=300) 
+    plt.savefig(os.path.join('figs','foc_res%d.ps'%(i+1)),dpi=300, orientation='landscape') 
     plt.close()   
 
 if r:
@@ -342,5 +342,5 @@ if r:
             pass
 
     plt.tight_layout()
-    plt.savefig(os.path.join('figs','foc_res%d.png'%(i+2)),dpi=300)
+    plt.savefig(os.path.join('figs','foc_res%d.ps'%(i+2)),dpi=300, orientation='landscape')
     plt.close()

@@ -255,6 +255,7 @@ class main():
                         
                         First_Motion = ' '
                         
+                    print(line)
                     arival_t = dt(int(line[6][0:4]),int(line[6][4:6]),int(line[6][6:8]),
                                   int(line[7][0:2]),int(line[7][2:4]),int(line[8].split('.')[0]),
                                   int(line[8].split('.')[1])*100)
