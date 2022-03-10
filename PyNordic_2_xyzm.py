@@ -1,85 +1,106 @@
 #!/home/saeed/Programs/miniconda3/bin/python
 
 from datetime import datetime as dt
-from random import gammavariate, choice, seed
 from math import sqrt
-import os
 
-def get_mag():
+# Make a new event entity
+def makeNewEventEntity():
+    event = {"Line1": [],
+             "LineE": [],
+             "Line4": [],
+             }
+    return event
 
-    seed(1)
-    mag = [gammavariate(2,2) for _ in range(500)]
-    mag = [m/max(mag) for m in mag]
-    mag = [m*3.5 for m in mag]
+# Calculate root mean square
+def getRMS(a):
+    ms = 0
+    N = len(a)
+    for i in range(N):
+        ms += a[i]**2
+    ms /= N
+    rms = sqrt(ms)
+    return rms
 
-    return mag
+# Parse line type "1" in NORDIC file
+def parseLin1(l):
+    for i in [6, 8, 11, 12, 13, 14, 16, 17, 19]:
+        if l[i] == " ":
+            l = l[:i]+"0"+l[i+1:]
+    ot = dt.strptime(l[1:20], "%Y %m%d %H%M %S.%f")
+    lat = float(l[24:30])
+    lon = float(l[32:38])
+    dep = float(l[39:43])
+    mag = 0
+    return ot, lat, lon, dep, mag
 
-random_mag = get_mag()
+# Parse line type "E" in NORDIC file
+def parseLineE(l):
+    gap = float(l[5:8])
+    ErX = float(l[25:30])
+    ErY = float(l[33:38])
+    ErZ = float(l[38:43])
+    ErH = sqrt(ErX**2 + ErY**2)
+    return gap, ErH, ErZ
 
-def mk_seisan_report():
-
-    sfile = input('\n+++ Enter NORDIC file name:\n\n')
-
-    with open('report.inp','w') as f:
-
-        f.write('Date TimeE L E LatE LonE Dep E F Aga Nsta Rms Gap McA MlA MbA MsA MwA Fp Spec \n')
-        f.write('1    2         3  6 4  7 5   8       9    10  11      12                      \n')
-
-    os.system('report %s report.inp > /dev/null'%sfile)
-
-mk_seisan_report()
-
-with open("report.out") as f, open("xyzm.dat", "w") as g:
-
-    g.write('     LON     LAT   DEPTH     MAG    PHUSD   NO_ST   MIND     GAP     RMS     SEH     SEZ  YYYY MM DD HH MN SEC\n')
-
-    next(f)
-    n_corr_mag = 0
-    n_events = 0
-
-    for l in (f):
-
-        if not l[22:43].strip(): continue
-
-        yr = int(l[1:5])
-        mo = int(float(l[6:8]))
-        dy = int(float(l[8:10]))
-        hh = int(float(l[11:13]))
-        mm = int(float(l[13:15]))
-        ss = float(l[16:20])
-        if ss>=60.0: ss=59.99 
-        ms = ss - int(ss)
-        ms = int(ms*1e6)
-        ort = dt(yr,mo,dy,hh,mm,int(ss),ms)
-        ort = ort.strftime('  %Y %m %d %H %M %S.%f')[:24]
-        lat = float(l[21:28])
-        lon = float(l[29:37])
-        dep = float(l[38:43])
+# Parse line type "4" in NORDIC file
+def parseLine4(l, ot):
+    staCode = l[:5].strip()
+    phase = l[10].upper()
+    wt = int(l[14])
+    polarity = l[16]
+    for i in [18, 19, 20, 21, 23, 24, 26, 27]:
+        if l[i] == " ":
+            l = l[:i]+"0"+l[i+1:]
         try:
-            seh = sqrt(float(l[44:49])**2 + float(l[50:55])**2)
-        except ValueError: 
-            seh = 0.0
-        try:
-            sez = float(l[56:61])
-        except ValueError:
-            sez = 0.0 
-        nst = int(l[62:65])
-        rms = float(l[67:70])
-        gap = int(l[71:74])
-        if l[76:79].strip(): mag = float(l[76:79])
-        else: mag = choice(random_mag); n_corr_mag+=1
+            at = dt.strptime(l[18:28], "%H%M %S.%f")
+        except Exception as e:
+            if "second" in str(e):
+                at = dt.strptime(l[18:22], "%H%M")
+                at = at.replace(minute=at.minute+1)
+    at = at.replace(year=ot.year, month=ot.month, day=ot.day)
+    residual = float(l[63:68])
+    distance = float(l[70:75])
+    return staCode, phase, wt, polarity, at, residual, distance
 
-        nop=nst
-        mds=0
-        
-        fmt = '%8.3f%8.3f%8.1f%8.1f%8d%8d%8.1f%8d%8.3f%8.1f%8.1f'
-        fmt = fmt + ort+'\n'
+# Write to "xyzm" format
+def write2xyzm(event, xyzmFile):
+    ot, lat, lon, dep, mag = event["Line1"][0]
+    ot = ot.strftime("%Y %m %d %H %M %S.%f")[:21]
+    gap, erH, erZ = event["LineE"][0]
+    nStUsed = len(
+        list(set([line4[0] for line4 in event["Line4"] if line4[2] != 4])))
+    nPhaseP = len([line4[1] for line4 in event["Line4"]
+                  if (line4[1] == "P" and line4[2] != 4)])
+    nPhaseS = len([line4[1] for line4 in event["Line4"]
+                  if (line4[1] == "S" and line4[2] != 4)])
+    minD = min([line4[6] for line4 in event["Line4"] if line4[2] != 4])
+    rms = getRMS([line4[5] for line4 in event["Line4"] if line4[2] != 4])
+    xyzmFile.write("{lon:6.3f} {lat:6.3f} {dep:5.1f} {mag:4.1f} {nStUsed:7d} {nPhaseP:7d} {nPhaseS:7d} {minD:5.1f} {gap:3.0f} {rms:4.2f} {erH:6.2f} {erZ:6.2f} {ot:s}\n".format(
+        lon=lon, lat=lat, dep=dep, mag=mag, nStUsed=nStUsed, nPhaseP=nPhaseP, nPhaseS=nPhaseS, minD=minD, gap=gap, rms=rms, erH=erH, erZ=erZ, ot=ot
+    ))
 
-        g.write(fmt%(lon, lat, dep, mag, nop, nst, mds, gap, rms, seh, sez))
-        n_events+=1
+# Convert NORDIC file to "xyzm.dat"
+def nordic2xyzm(nordicFile):
+    event = makeNewEventEntity()
+    with open(nordicFile) as f, open("xyzm.dat", "w") as g:
+        g.write("   LON    LAT DEPTH  MAG NSTUSED NPHASEP NPHASES  MIND GAP  RMS    SEH    SEZ YYYY MM DD HH MN  SEC\n")
+        for l in f:
+            if l.strip() and len(l.strip()) == 79 and l[79] == "1":
+                ot, lat, lon, dep, mag = parseLin1(l)
+                event["Line1"].append([ot, lat, lon, dep, mag])
+            elif l.strip() and len(l.strip()) == 79 and l[79] == "E":
+                gap, ErH, ErZ = parseLineE(l)
+                event["LineE"].append([gap, ErH, ErZ])
+            elif l.strip() and len(l.strip()) == 79 and l[79] in [" ", "4"]:
+                staCode, phase, wt, polarity, at, residual, distance = parseLine4(
+                    l, ot)
+                event["Line4"].append(
+                    [staCode, phase, wt, polarity, at, residual, distance])
+            elif not l.strip():
+                write2xyzm(event, g)
+                event = makeNewEventEntity()
 
-cmd = "rm report*"
-os.system(cmd)
-
-print("\n+++ Number of converted events:", n_events)
-print("+++ Number of corrected Magnitudes:", n_corr_mag)
+# run package
+if __name__ == "__main__":
+    nordicFile = input("\n+++ Input NORDIC file name:\n")
+    nordic2xyzm(nordicFile)

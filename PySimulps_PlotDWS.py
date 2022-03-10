@@ -53,12 +53,14 @@ for vp_dws_file, vs_dws_file in zip(vp_dws_files, vs_dws_files):
     
     X = vp_dws[:,0][::-1].reshape(ny, nx)
     Y = vp_dws[:,1][::-1].reshape(ny, nx)
+    X = np.flip(X)
+    Y = np.flip(Y)
 
     dws_vp = vp_dws[:,2].reshape(ny, nx)
     dws_vs = vs_dws[:,2].reshape(ny, nx)
 
     # Plot and save results
-    with plt.rc.context(abc=True, abcstyle="a)"):
+    with plt.rc.context(abc="a)"):
         fig, axs = plt.subplots(ncols=2, share=0)
     axs.format(xlabel='Longitude',
                ylabel='Latitude')
