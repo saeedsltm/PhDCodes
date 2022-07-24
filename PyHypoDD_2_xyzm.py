@@ -3,6 +3,11 @@
 from datetime import datetime as dt
 from math import sqrt
 import os
+from pandas import read_csv, to_datetime
+
+header = ["year", "month", "day", "hour", "minute", "second", "Lat", "Lon", "Dep", "Mag", "ErH", "ErZ", "RMS", "ID"]
+events = read_csv("../phase.dat", names=header, delim_whitespace=True, index_col=0)
+ots = to_datetime(events[['year', 'month', 'day', "hour", "minute", "second"]])
 
 with open("hypoDD.reloc") as f, open("xyzm.dat", "w") as g:
 
@@ -20,7 +25,12 @@ with open("hypoDD.reloc") as f, open("xyzm.dat", "w") as g:
         msc = int((sc - int(sc))*1e6)
         sc = int(sc)
         ort = dt(yr,mo,dy,hr,mn,sc,msc)
-        ort = ort.strftime('  %Y %m %d %H %M %S.%f')[:24]
+        mag = events[(ots-ort).astype("timedelta64[h]").abs()<5].Mag[0]
+        ort = ort.strftime("  %Y %m %d %H %M %S.%f")[:24]
+        
+        if not mag:
+            mag = 0.0
+        
 
         nop = 99
         nst = 99

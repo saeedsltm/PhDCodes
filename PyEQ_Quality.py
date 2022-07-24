@@ -23,15 +23,15 @@ def sum_reader(root, sum_type):
     # ~ CC = {"MIN_OBS":0, "MAX_GAP":360, "MAX_RMS":9.9, "MAX_ERH":999, "MAX_ERZ":999}
     # ~ OT = {"MIN_OBS":0, "MAX_GAP":360, "MAX_RMS":9.9, "MAX_ERH":999, "MAX_ERZ":999}
 # Hypoellipse & NLLOC
-    CA = {"MIN_OBS":3, "MAX_GAP":270, "MAX_RMS":0.5, "MAX_ERH":3.0, "MAX_ERZ":3.0}
-    CB = {"MIN_OBS":3, "MAX_GAP":270, "MAX_RMS":0.5, "MAX_ERH":5.0, "MAX_ERZ":5.0}
-    CC = {"MIN_OBS":3, "MAX_GAP":360, "MAX_RMS":0.5, "MAX_ERH":5.0, "MAX_ERZ":5.0}
-    OT = {"MIN_OBS":3, "MAX_GAP":360, "MAX_RMS":9.9, "MAX_ERH":999, "MAX_ERZ":999}
+    # CA = {"MIN_OBS":3, "MAX_GAP":270, "MAX_RMS":0.5, "MAX_ERH":3.0, "MAX_ERZ":3.0}
+    # CB = {"MIN_OBS":3, "MAX_GAP":270, "MAX_RMS":0.5, "MAX_ERH":5.0, "MAX_ERZ":5.0}
+    # CC = {"MIN_OBS":3, "MAX_GAP":360, "MAX_RMS":0.5, "MAX_ERH":5.0, "MAX_ERZ":5.0}
+    # OT = {"MIN_OBS":3, "MAX_GAP":360, "MAX_RMS":9.9, "MAX_ERH":999, "MAX_ERZ":999}
 # ~ # HypoDD
-    # CA = {"MIN_OBS":1, "MAX_GAP":400, "MAX_RMS":0.1, "MAX_ERH":1.0, "MAX_ERZ":2.0}
-    # CB = {"MIN_OBS":1, "MAX_GAP":400, "MAX_RMS":0.2, "MAX_ERH":2.0, "MAX_ERZ":4.0}
-    # CC = {"MIN_OBS":1, "MAX_GAP":400, "MAX_RMS":0.3, "MAX_ERH":4.0, "MAX_ERZ":8.0}
-    # OT = {"MIN_OBS":1, "MAX_GAP":400, "MAX_RMS":1.0, "MAX_ERH":99., "MAX_ERZ":99.}
+    CA = {"MIN_OBS":1, "MAX_GAP":400, "MAX_RMS":0.4, "MAX_ERH":4.0, "MAX_ERZ":5.0}
+    CB = {"MIN_OBS":1, "MAX_GAP":400, "MAX_RMS":0.4, "MAX_ERH":5.0, "MAX_ERZ":7.0}
+    CC = {"MIN_OBS":1, "MAX_GAP":400, "MAX_RMS":0.5, "MAX_ERH":7.0, "MAX_ERZ":15.}
+    OT = {"MIN_OBS":1, "MAX_GAP":400, "MAX_RMS":1.0, "MAX_ERH":99., "MAX_ERZ":99.}
 
     out_A = os.path.join(root, "QA.dat")
     out_B = os.path.join(root, "QB.dat")
@@ -79,13 +79,13 @@ def sum_reader(root, sum_type):
         columns = ["LON", "LAT", "DEPTH", "MAG", "GAP", "RMS", "SEH", "SEZ"]
         # CLASS A
         db_A = db[(nob>CA["MIN_OBS"])&(gap<CA["MAX_GAP"])&(rms<CA["MAX_RMS"])&(erh<CA["MAX_ERH"])&(erz<CA["MAX_ERZ"])]
-        db_A.to_csv(out_A, sep="\t", float_format="%7.3f", columns=columns, index=False, header=True)
+        db_A.to_csv(out_A, sep="\t", float_format="%7.3f", columns=columns, index=False, header=False)
         # CLASS B
         db_B = db[(nob>CB["MIN_OBS"])&(gap<CB["MAX_GAP"])&(rms<CB["MAX_RMS"])&(erh<CB["MAX_ERH"])&(erz<CB["MAX_ERZ"])]
-        db_B.to_csv(out_B, sep="\t", float_format="%7.3f", columns=columns, index=False, header=True)
+        db_B.to_csv(out_B, sep="\t", float_format="%7.3f", columns=columns, index=False, header=False)
         # CLASS C
         db_C = db[(nob>CC["MIN_OBS"])&(gap<CC["MAX_GAP"])&(rms<CC["MAX_RMS"])&(erh<CC["MAX_ERH"])&(erz<CC["MAX_ERZ"])]
-        db_C.to_csv(out_C, sep="\t", float_format="%7.3f", columns=columns, index=False, header=True)
+        db_C.to_csv(out_C, sep="\t", float_format="%7.3f", columns=columns, index=False, header=False)
         # Others
         db_O = db[(nob>OT["MIN_OBS"])&(gap<OT["MAX_GAP"])&(rms<OT["MAX_RMS"])&(erh<OT["MAX_ERH"])&(erz<OT["MAX_ERZ"])]
-        db_O.to_csv(out_O, sep="\t", float_format="%7.3f", columns=columns, index=False, header=True)
+        db_O.to_csv(out_O, sep="\t", float_format="%7.3f", columns=columns, index=False, header=False)
