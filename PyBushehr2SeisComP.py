@@ -20,7 +20,7 @@ listDir = sorted(filter(os.path.isdir, os.listdir(os.getcwd())), key=lambda x: x
 
 for d in listDir:
     # PARSIAN
-    if d.upper().startswith("N") or d.upper().startswith("P"):
+    if d.upper().startswith("N") or d.upper().startswith("P") or d.upper().startswith("F"):
         files = sorted(glob(os.path.join(d, "archive", "*SYNC")))
         cmd = "seiscomp exec scart -I %s.mseed %s"%(d, sdsarchive)
         bad_files = 0
